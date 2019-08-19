@@ -1,9 +1,11 @@
 package com.woowacourse.zzinbros.user.web;
 
 import com.woowacourse.zzinbros.user.domain.User;
-import com.woowacourse.zzinbros.user.web.support.UserSession;
 import com.woowacourse.zzinbros.user.domain.UserTest;
+import com.woowacourse.zzinbros.user.dto.LoginUserDto;
 import com.woowacourse.zzinbros.user.service.UserService;
+import com.woowacourse.zzinbros.user.web.controller.UserEditPageController;
+import com.woowacourse.zzinbros.user.web.support.LoginSessionManager;
 import com.woowacourse.zzinbros.user.web.support.UserArgumentResolver;
 import com.woowacourse.zzinbros.user.web.support.UserControllerExceptionAdvice;
 import org.junit.jupiter.api.BeforeEach;
@@ -28,15 +30,18 @@ class UserEditPageControllerTest {
     @Mock
     UserService userService;
 
+    @Mock
+    LoginSessionManager loginSessionManager;
+
     @InjectMocks
     UserEditPageController userEditPageController;
 
-    private UserSession userSession;
+    private LoginUserDto loginUserDto;
     private User user;
 
     @BeforeEach
     void setUp() {
-        userSession = new UserSession(UserControllerTest.BASE_ID, UserTest.BASE_NAME, UserTest.BASE_EMAIL);
+        loginUserDto = new LoginUserDto(UserControllerTest.BASE_ID, UserTest.BASE_NAME, UserTest.BASE_EMAIL);
         user = new User(UserTest.BASE_NAME, UserTest.BASE_EMAIL, UserTest.BASE_PASSWORD);
         mockMvc = MockMvcBuilders.standaloneSetup(userEditPageController)
                 .setCustomArgumentResolvers(new UserArgumentResolver())
@@ -48,7 +53,7 @@ class UserEditPageControllerTest {
     @DisplayName("사용자가 유저 수정 페이지로 이동")
     void showEditPageTest() throws Exception {
         mockMvc.perform(get("/users/" + UserControllerTest.BASE_ID + "/edit")
-                .sessionAttr(UserSession.LOGIN_USER, userSession))
+                .sessionAttr(LoginUserDto.LOGIN_USER, loginUserDto))
                 .andExpect(status().isOk());
     }
 

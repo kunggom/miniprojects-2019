@@ -1,10 +1,12 @@
 package com.woowacourse.zzinbros.user.web;
 
 import com.woowacourse.zzinbros.user.domain.UserTest;
+import com.woowacourse.zzinbros.user.dto.LoginUserDto;
 import com.woowacourse.zzinbros.user.dto.UserRequestDto;
 import com.woowacourse.zzinbros.user.exception.UserLoginException;
 import com.woowacourse.zzinbros.user.service.UserService;
-import com.woowacourse.zzinbros.user.web.support.UserSession;
+import com.woowacourse.zzinbros.user.web.controller.LoginController;
+import com.woowacourse.zzinbros.user.web.support.LoginSessionManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -29,15 +31,18 @@ class LoginControllerTest {
     @Mock
     UserService userService;
 
+    @Mock
+    LoginSessionManager loginSessionManager;
+
     @InjectMocks
     LoginController loginController;
 
     private UserRequestDto userRequestDto;
-    private UserSession userSession;
+    private LoginUserDto loginUserDto;
 
     @BeforeEach
     void setUp() {
-        userSession = new UserSession(UserControllerTest.BASE_ID, UserTest.BASE_NAME, UserTest.BASE_EMAIL);
+        loginUserDto = new LoginUserDto(UserControllerTest.BASE_ID, UserTest.BASE_NAME, UserTest.BASE_EMAIL);
         userRequestDto = new UserRequestDto(UserTest.BASE_NAME, UserTest.BASE_EMAIL, UserTest.BASE_PASSWORD);
 
         mockMvc = MockMvcBuilders.standaloneSetup(loginController)
@@ -47,7 +52,7 @@ class LoginControllerTest {
 
     @Test
     void loginSuccess() throws Exception {
-        given(userService.login(userRequestDto)).willReturn(userSession);
+        given(userService.login(userRequestDto)).willReturn(loginUserDto);
 
         String url = mockMvc.perform(post("/login")
                 .param("name", userRequestDto.getName())
@@ -55,7 +60,6 @@ class LoginControllerTest {
                 .param("password", userRequestDto.getPassword()))
                 .andExpect(status().isFound())
                 .andReturn().getResponse().getHeader("Location");
-
         assertTrue(url.equals("/"));
     }
 
