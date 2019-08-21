@@ -1,5 +1,6 @@
 package com.woowacourse.zzinbros.post.domain;
 
+import com.woowacourse.zzinbros.mediafile.MediaFile;
 import com.woowacourse.zzinbros.post.exception.UnAuthorizedException;
 import com.woowacourse.zzinbros.user.domain.User;
 import org.hibernate.annotations.CreationTimestamp;
@@ -18,6 +19,7 @@ public class Post {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Lob
     private String contents;
 
     @CreationTimestamp
@@ -31,7 +33,11 @@ public class Post {
     @JoinColumn(name = "author_id", foreignKey = @ForeignKey(name = "post_to_user"))
     private User author;
 
-    @OneToMany(mappedBy = "post", cascade = {CascadeType.REMOVE, CascadeType.PERSIST} )
+    @OneToMany
+    @JoinColumn(name = "media_file_id", foreignKey = @ForeignKey(name = "post_to_media_file"))
+    private List<MediaFile> mediaFiles = new ArrayList<>();
+
+    @OneToMany(mappedBy = "post", cascade = {CascadeType.REMOVE, CascadeType.PERSIST})
     private Set<PostLike> postLikes = new HashSet<>();
 
     @Column
@@ -58,10 +64,15 @@ public class Post {
         return this.author.equals(user);
     }
 
+    public void addMediaFiles(MediaFile mediaFile) {
+        this.mediaFiles.add(mediaFile);
+    }
+
     public void addLike(PostLike postLike) {
         postLikes.add(postLike);
         countOfLike++;
     }
+
     public void removeLike(PostLike postLike) {
         postLikes.remove(postLike);
         countOfLike--;
@@ -87,6 +98,14 @@ public class Post {
         return author;
     }
 
+    public List<MediaFile> getMediaFiles() {
+        return new ArrayList<>(mediaFiles);
+    }
+
+    public void setMediaFiles(List<MediaFile> mediaFiles) {
+        this.mediaFiles = mediaFiles;
+    }
+
     public Set<PostLike> getPostLikes() {
         return Collections.unmodifiableSet(postLikes);
     }
@@ -94,7 +113,6 @@ public class Post {
     public int getCountOfLike() {
         return countOfLike;
     }
-
 
     @Override
     public boolean equals(Object o) {
