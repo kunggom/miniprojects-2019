@@ -8,7 +8,10 @@ import com.woowacourse.zzinbros.comment.service.CommentService;
 import com.woowacourse.zzinbros.post.domain.Post;
 import com.woowacourse.zzinbros.post.service.PostService;
 import com.woowacourse.zzinbros.user.domain.User;
+import com.woowacourse.zzinbros.user.dto.UserResponseDto;
 import com.woowacourse.zzinbros.user.service.UserService;
+import com.woowacourse.zzinbros.user.web.support.UserArgumentResolver;
+import com.woowacourse.zzinbros.user.web.support.UserSession;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -39,6 +42,7 @@ class CommentControllerTest extends BaseTest {
     private Post mockPost = new Post(MOCK_CONTENTS, mockUser);
     private Comment mockComment = new Comment(mockUser, mockPost, MOCK_CONTENTS);
     private String commentRequestDto;
+    private UserResponseDto mockUserDto = new UserResponseDto(MOCK_ID, mockUser.getName(), mockUser.getEmail());
 
     private MockMvc mockMvc;
 
@@ -54,9 +58,14 @@ class CommentControllerTest extends BaseTest {
     @MockBean
     PostService postService;
 
+    @MockBean
+    UserSession userSession;
+
     @BeforeAll
     void setUp() throws Exception {
-        mockMvc = MockMvcBuilders.standaloneSetup(commentController)
+        mockMvc = MockMvcBuilders
+                .standaloneSetup(commentController)
+                .setCustomArgumentResolvers(new UserArgumentResolver())
                 .alwaysDo(print())
                 .build();
 
@@ -73,7 +82,7 @@ class CommentControllerTest extends BaseTest {
 
         mockMvc.perform(post(MAPPING_PATH)
                 .content(commentRequestDto)
-                .sessionAttr(LOGIN_USER, mockUser)
+                .sessionAttr(LOGIN_USER, mockUserDto)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated());
     }
@@ -84,7 +93,7 @@ class CommentControllerTest extends BaseTest {
 
         mockMvc.perform(put(MAPPING_PATH)
                 .content(commentRequestDto)
-                .sessionAttr(LOGIN_USER, mockUser)
+                .sessionAttr(LOGIN_USER, mockUserDto)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
@@ -93,7 +102,7 @@ class CommentControllerTest extends BaseTest {
     void delete_mapping() throws Exception {
         mockMvc.perform(delete(MAPPING_PATH)
                 .content(commentRequestDto)
-                .sessionAttr(LOGIN_USER, mockUser)
+                .sessionAttr(LOGIN_USER, mockUserDto)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().string("true"));
     }

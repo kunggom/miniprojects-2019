@@ -6,8 +6,9 @@ import com.woowacourse.zzinbros.comment.service.CommentService;
 import com.woowacourse.zzinbros.post.domain.Post;
 import com.woowacourse.zzinbros.post.service.PostService;
 import com.woowacourse.zzinbros.user.domain.User;
-import com.woowacourse.zzinbros.user.dto.UserResponseDto;
 import com.woowacourse.zzinbros.user.service.UserService;
+import com.woowacourse.zzinbros.user.web.support.SessionInfo;
+import com.woowacourse.zzinbros.user.web.support.UserSession;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,22 +27,22 @@ public class CommentController {
     }
 
     @PostMapping
-    public ResponseEntity<Comment> add(@RequestBody final CommentRequestDto dto, final UserResponseDto loginUserDto) {
-        final User user = userService.findLoggedInUser(loginUserDto);
+    public ResponseEntity<Comment> add(@RequestBody final CommentRequestDto dto, @SessionInfo final UserSession userSession) {
+        final User user = userService.findLoggedInUser(userSession.getDto());
         final Post post = postService.read(dto.getPostId());
         final String contents = dto.getContents();
         return new ResponseEntity<>(commentService.add(user, post, contents), HttpStatus.CREATED);
     }
 
     @PutMapping
-    public ResponseEntity<Comment> edit(@RequestBody final CommentRequestDto dto, final UserResponseDto loginUserDto) {
-        final User user = userService.findLoggedInUser(loginUserDto);
+    public ResponseEntity<Comment> edit(@RequestBody final CommentRequestDto dto, @SessionInfo final UserSession userSession) {
+        final User user = userService.findLoggedInUser(userSession.getDto());
         return new ResponseEntity<>(commentService.update(dto.getCommentId(), dto.getContents(), user), HttpStatus.OK);
     }
 
     @DeleteMapping
-    public ResponseEntity<Boolean> delete(@RequestBody final CommentRequestDto dto, final UserResponseDto loginUserDto) {
-        final User user = userService.findLoggedInUser(loginUserDto);
+    public ResponseEntity<Boolean> delete(@RequestBody final CommentRequestDto dto, @SessionInfo final UserSession userSession) {
+        final User user = userService.findLoggedInUser(userSession.getDto());
         try {
             commentService.delete(dto.getCommentId(), user);
             return new ResponseEntity<>(true, HttpStatus.OK);
