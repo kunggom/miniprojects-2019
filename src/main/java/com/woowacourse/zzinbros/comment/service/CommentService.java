@@ -28,14 +28,14 @@ public class CommentService {
         return Collections.unmodifiableList(commentRepository.findByPost(post));
     }
 
-    public Comment findById(final Long commentId) {
+    public Comment findById(final long commentId) {
         return commentRepository
                 .findById(commentId)
                 .orElseThrow(CommentNotFoundException::new);
     }
 
     @Transactional
-    public Comment update(final Long commentId, final String newContents, final User author) {
+    public Comment update(final long commentId, final String newContents, final User author) {
         final Comment comment = commentRepository
                 .findById(commentId)
                 .orElseThrow(CommentNotFoundException::new);
@@ -44,7 +44,7 @@ public class CommentService {
         return comment;
     }
 
-    public void delete(final Long commentId, final User author) {
+    public void delete(final long commentId, final User author) {
         final Comment comment = commentRepository
                 .findById(commentId)
                 .orElseThrow(CommentNotFoundException::new);
