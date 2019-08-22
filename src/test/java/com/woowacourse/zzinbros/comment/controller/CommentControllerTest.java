@@ -75,7 +75,7 @@ class CommentControllerTest extends BaseTest {
                 .content(commentRequestDto)
                 .sessionAttr(LOGIN_USER, mockUser)
                 .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
+                .andExpect(status().isCreated());
     }
 
     @Test

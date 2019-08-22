@@ -8,6 +8,8 @@ import com.woowacourse.zzinbros.post.service.PostService;
 import com.woowacourse.zzinbros.user.domain.User;
 import com.woowacourse.zzinbros.user.dto.UserResponseDto;
 import com.woowacourse.zzinbros.user.service.UserService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -24,27 +26,27 @@ public class CommentController {
     }
 
     @PostMapping
-    public Comment add(@RequestBody final CommentRequestDto dto, final UserResponseDto loginUserDto) {
+    public ResponseEntity<Comment> add(@RequestBody final CommentRequestDto dto, final UserResponseDto loginUserDto) {
         final User user = userService.findLoggedInUser(loginUserDto);
         final Post post = postService.read(dto.getPostId());
         final String contents = dto.getContents();
-        return commentService.add(user, post, contents);
+        return new ResponseEntity<>(commentService.add(user, post, contents), HttpStatus.CREATED);
     }
 
     @PutMapping
-    public Comment edit(@RequestBody final CommentRequestDto dto, final UserResponseDto loginUserDto) {
+    public ResponseEntity<Comment> edit(@RequestBody final CommentRequestDto dto, final UserResponseDto loginUserDto) {
         final User user = userService.findLoggedInUser(loginUserDto);
-        return commentService.update(dto.getCommentId(), dto.getContents(), user);
+        return new ResponseEntity<>(commentService.update(dto.getCommentId(), dto.getContents(), user), HttpStatus.OK);
     }
 
     @DeleteMapping
-    public boolean delete(@RequestBody final CommentRequestDto dto, final UserResponseDto loginUserDto) {
+    public ResponseEntity<Boolean> delete(@RequestBody final CommentRequestDto dto, final UserResponseDto loginUserDto) {
         final User user = userService.findLoggedInUser(loginUserDto);
         try {
             commentService.delete(dto.getCommentId(), user);
-            return true;
+            return new ResponseEntity<>(true, HttpStatus.OK);
         } catch (final Exception e) {
-            return false;
+            return new ResponseEntity<>(false, HttpStatus.FORBIDDEN);
         }
     }
 }
