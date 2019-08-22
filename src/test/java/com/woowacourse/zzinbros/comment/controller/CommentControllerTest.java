@@ -1,6 +1,7 @@
 package com.woowacourse.zzinbros.comment.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.woowacourse.zzinbros.BaseTest;
 import com.woowacourse.zzinbros.comment.domain.Comment;
 import com.woowacourse.zzinbros.comment.dto.CommentRequestDto;
 import com.woowacourse.zzinbros.comment.service.CommentService;
@@ -30,7 +31,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
 @TestInstance(value = TestInstance.Lifecycle.PER_CLASS)
-class CommentControllerTest {
+class CommentControllerTest extends BaseTest {
     private static final Long MOCK_ID = 1L;
     private static final String LOGIN_USER = "loggedInUser";
     private static final String MAPPING_PATH = "/comments";
