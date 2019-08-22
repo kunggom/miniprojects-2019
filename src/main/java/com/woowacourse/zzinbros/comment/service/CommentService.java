@@ -20,6 +20,7 @@ public class CommentService {
         this.commentRepository = commentRepository;
     }
 
+    @Transactional
     public Comment add(final User author, final Post post, final String contents) {
         return commentRepository.save(new Comment(author, post, contents));
     }
@@ -44,11 +45,13 @@ public class CommentService {
         return comment;
     }
 
+    @Transactional
     public void delete(final long commentId, final User author) {
         final Comment comment = commentRepository
                 .findById(commentId)
                 .orElseThrow(CommentNotFoundException::new);
         checkMatchedUser(comment, author);
+        comment.prepareToDelete();
         commentRepository.delete(comment);
     }
 
